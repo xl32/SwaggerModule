@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SwaggerModule
  *
@@ -18,40 +19,34 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
+declare(strict_types=1);
+
 namespace SwaggerModule\Controller;
 
 use Interop\Container\ContainerInterface;
 use OpenApi\Annotations\OpenApi;
-use Laminas\ServiceManager\AbstractFactoryInterface;
-use Laminas\ServiceManager\AbstractPluginManager;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
+use SwaggerModule\Options\ModuleOptions;
 
 class DocumentationControllerFactory implements AbstractFactoryInterface
 {
-    public function canCreate(ContainerInterface $container, $requestedName)
+    public function canCreate(ContainerInterface $container, $requestedName): bool
     {
         return class_exists($requestedName);
     }
 
-    public function canCreateServiceWithName(ServiceLocatorInterface $services, $name, $requestedName)
-    {
-        return $this->canCreate($services, $requestedName);
-    }
-
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        array $options = null
+    ): DocumentationController {
         $controller = new DocumentationController();
         /** @var OpenApi $openApi */
-        $openApi = $container->get('OpenApi\Annotations\OpenApi');
+        $openApi = $container->get(OpenApi::class);
         $controller->setOpenApi($openApi);
-        return $controller;
-    }
 
-    public function createServiceWithName(ServiceLocatorInterface $services, $name, $requestedName)
-    {
-        if ($services instanceof AbstractPluginManager) {
-            $services = $services->getServiceLocator();
-        }
-        return $this($services, $requestedName);
+        $moduleOptions = $container->get(ModuleOptions::class);
+        $controller->setModuleOptions($moduleOptions);
+        return $controller;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SwaggerModule
  *
@@ -15,8 +16,10 @@
  * limitations under the License.
  *
  * @copyright  Copyright (c) 2012 OuterEdge UK Ltd (http://www.outeredgeuk.com)
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
+
+declare(strict_types=1);
 
 namespace SwaggerModule\Options;
 
@@ -36,27 +39,27 @@ class ModuleOptions extends AbstractOptions
     protected $paths;
 
     /**
-     * Key - Value array for resource details 
+     * Key - Value array for resource details
      *
-     * @var array 
+     * @var array
      */
     protected $resourceOptions;
 
     /**
      * Set an array of paths where the files to be scanned by Swagger are searched
      *
-     * @param  array $paths
-     * @throws Exception\RuntimeException
+     * @param array $paths
      * @return ModuleOptions
+     * @throws Exception\RuntimeException
      */
     public function setPaths(array $paths)
     {
-        if(count($paths) < 1) {
+        if (count($paths) < 1) {
             throw new Exception\RuntimeException('No path(s) were specified for SwaggerModule');
         }
 
         foreach ($paths as $path) {
-            if (!is_dir($path)) {
+            if (! is_dir($path)) {
                 throw new Exception\RuntimeException(sprintf(
                     'Path %s given to SwaggerModule is invalid',
                     $path
@@ -86,14 +89,14 @@ class ModuleOptions extends AbstractOptions
      */
     public function getFileList()
     {
-        $fileList = array();
+        $fileList = [];
 
         foreach ($this->paths as $path) {
             $directoryIterator = new DirectoryIterator($path);
 
             /** @var $file DirectoryIterator */
             foreach ($directoryIterator as $file) {
-                if (!$file->isDir()) {
+                if (! $file->isDir()) {
                     $fileList[] = $file->getPathname();
                 }
             }

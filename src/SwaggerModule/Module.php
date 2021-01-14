@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SwaggerModule
  *
@@ -15,17 +16,19 @@
  * limitations under the License.
  *
  * @copyright  Copyright (c) 2012 OuterEdge UK Ltd (http://www.outeredgeuk.com)
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
+
+declare(strict_types=1);
 
 namespace SwaggerModule;
 
+use OpenApi\Annotations\OpenApi;
 use RuntimeException;
 use SwaggerModule\Options\ModuleOptions as SwaggerModuleOptions;
 use OpenApi\StaticAnalyser as OpenApiStaticAnalyser;
 use OpenApi\Analysis as OpenApiAnalysis;
 use OpenApi\Util as OpenApiUtil;
-use Laminas\Console\Adapter\AdapterInterface;
 use Laminas\ModuleManager\Feature\ConfigProviderInterface;
 use Laminas\ModuleManager\Feature\ServiceProviderInterface;
 
@@ -47,33 +50,33 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
      */
     public function getServiceConfig()
     {
-        return array(
-            'aliases' => array(
-                'service.swagger' => 'Swagger\Annotations\Swagger',
-            ),
+        return [
+            'aliases' => [
+                'service.swagger' => 'OpenApi\Annotations\OpenApi',
+            ],
 
-            'factories' => array(
-                'SwaggerModule\Options\ModuleOptions' => function ($serviceManager) {
+            'factories' => [
+                SwaggerModuleOptions::class => function ($serviceManager) {
                     $config = $serviceManager->get('Config');
                     $config = (isset($config['swagger']) ? $config['swagger'] : null);
 
-                    if($config === null) {
+                    if ($config === null) {
                         throw new RuntimeException('Configuration for SwaggerModule was not found');
                     }
 
                     return new SwaggerModuleOptions($config);
                 },
 
-                'OpenApi\Annotations\OpenApi' => function($serviceManager) {
-                    /** @var $options \SwaggerModule\Options\ModuleOptions */
-                    $options = $serviceManager->get('SwaggerModule\Options\ModuleOptions');
-                    $analyser = new OpenApiStaticAnalyser();
-                    $analysis = new OpenApiAnalysis();
+                OpenApi::class => function ($serviceManager) {
+                    /** @var $options SwaggerModuleOptions */
+                    $options    = $serviceManager->get('SwaggerModule\Options\ModuleOptions');
+                    $analyser   = new OpenApiStaticAnalyser();
+                    $analysis   = new OpenApiAnalysis();
                     $processors = OpenApiAnalysis::processors();
 
                     // Crawl directory and parse all files
                     $paths = $options->getPaths();
-                    foreach($paths as $directory) {
+                    foreach ($paths as $directory) {
                         $finder = OpenApiUtil::finder($directory);
                         foreach ($finder as $file) {
                             $analysis->addAnalysis($analyser->fromFile($file->getPathname()));
@@ -86,22 +89,22 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
 
                     // Pass options to analyzer
                     $resourceOptions = $options->getResourceOptions();
-                    if(! empty($resourceOptions['servers'])) {
+                    if (! empty($resourceOptions['servers'])) {
                         $analysis->openapi->servers = $resourceOptions['servers'];
                     }
-                    if(! empty($resourceOptions['defaultBasePath'])) {
+                    if (! empty($resourceOptions['defaultBasePath'])) {
                         $analysis->openapi->servers['basePath'] = $resourceOptions['defaultBasePath'];
                     }
-                    if(! empty($resourceOptions['defaultHost'])) {
+                    if (! empty($resourceOptions['defaultHost'])) {
                         $analysis->openapi->servers['host'] = $resourceOptions['defaultHost'];
                     }
-                    if(! empty($resourceOptions['schemes'])) {
+                    if (! empty($resourceOptions['schemes'])) {
                         $analysis->openapi->servers['schemes'] = $resourceOptions['schemes'];
                     }
 
                     return $analysis->openapi;
                 },
-            )
-        );
+            ],
+        ];
     }
 }

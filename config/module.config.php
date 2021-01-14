@@ -1,41 +1,45 @@
 <?php
 
-return array(
-    'router' => array(
-        'routes' => array(
-            'swagger-resources' => array(
+use SwaggerModule\Controller\DocumentationController;
+use SwaggerModule\Controller\DocumentationControllerFactory;
+
+return [
+    'router' => [
+        'routes' => [
+            'swagger-resources' => [
                 'type'    => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/api/docs',
-                    'defaults' => array(
-                        'controller' => 'SwaggerModule\Controller\Documentation',
-                        'action'     => 'display'
-                    )
-                )
-            ),
+                    'defaults' => [
+                        'controller' => DocumentationController::class,
+                        'action'     => 'display',
+                    ],
+                ],
+            ],
 
-            'swagger-resource-detail' => array(
+            'swagger-resource-detail' => [
                 'type'    => 'Segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/api/docs/:resource',
-                    'defaults' => array(
-                        'controller' => 'SwaggerModule\Controller\Documentation',
-                        'action'     => 'details'
-                    )
-                )
-            )
-        )
-    ),
+                    'defaults' => [
+                        'controller' => DocumentationController::class,
+                        'action'     => 'details',
+                    ],
+                ],
+            ],
+        ],
+    ],
 
-    'controllers' => array(
-        'factories' => array(
-            'SwaggerModule\Controller\Documentation' => 'SwaggerModule\Controller\DocumentationControllerFactory',
-        ),
-    ),
+    'controllers' => [
+        'factories' => [
+            DocumentationController::class =>
+                DocumentationControllerFactory::class,
+        ],
+    ],
 
-    'view_manager' => array(
-        'strategies' => array(
-            'ViewJsonStrategy'
-        ),
-    ),
-);
+    'view_manager' => [
+        'strategies' => [
+            'ViewJsonStrategy',
+        ],
+    ],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SwaggerModule
  *
@@ -18,21 +19,34 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
+declare(strict_types=1);
+
 namespace SwaggerModule\Controller;
 
 use OpenApi\Annotations\OpenApi;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
+use SwaggerModule\Options\ModuleOptions;
 
 /**
  * DocumentationController. It is used to display a documentation in HTML
  */
 class DocumentationController extends AbstractActionController
 {
+    /** @var OpenApi */
     protected $openApi;
 
-    public function setOpenApi(OpenApi $openApi) {
-        $this->swagger = $openApi;
+    /** @var ModuleOptions */
+    protected $moduleOptions;
+
+    public function setOpenApi(OpenApi $openApi)
+    {
+        $this->openApi = $openApi;
+    }
+
+    public function setModuleOptions(ModuleOptions $moduleOptions)
+    {
+        $this->moduleOptions = $moduleOptions;
     }
 
     /**
@@ -42,28 +56,7 @@ class DocumentationController extends AbstractActionController
      */
     public function displayAction()
     {
-        $jsonModel = new JsonModel((array)$this->swagger->jsonSerialize());
+        $jsonModel = new JsonModel((array)$this->openApi->jsonSerialize());
         return $jsonModel;
-    }
-
-    /**
-     * Get the details of a resource
-     *
-     * @return JsonModel
-     */
-    public function detailsAction()
-    {
-        /** @var $options \SwaggerModule\Options\ModuleOptions */
-        $options = $this->serviceLocator->get('SwaggerModule\Options\ModuleOptions');
-        $resourceOptions = $options->getResourceOptions() ? : array();
-        $resource = $this->swagger->getResource('/' . $this->params('resource', null), $resourceOptions);
-
-        if ($resource === false) {
-            return new JsonModel();
-        }
-
-        $jsonModel = new JsonModel();
-
-        return $jsonModel->setVariables($resource);
     }
 }
