@@ -69,7 +69,7 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
 
                 OpenApi::class => function ($serviceManager) {
                     /** @var $options SwaggerModuleOptions */
-                    $options    = $serviceManager->get('SwaggerModule\Options\ModuleOptions');
+                    $options    = $serviceManager->get(\SwaggerModule\Options\ModuleOptions::class);
                     $analyser   = new OpenApiStaticAnalyser();
                     $analysis   = new OpenApiAnalysis();
                     $processors = OpenApiAnalysis::processors();
@@ -89,18 +89,7 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
 
                     // Pass options to analyzer
                     $resourceOptions = $options->getResourceOptions();
-                    if (! empty($resourceOptions['servers'])) {
-                        $analysis->openapi->servers = $resourceOptions['servers'];
-                    }
-                    if (! empty($resourceOptions['defaultBasePath'])) {
-                        $analysis->openapi->servers['basePath'] = $resourceOptions['defaultBasePath'];
-                    }
-                    if (! empty($resourceOptions['defaultHost'])) {
-                        $analysis->openapi->servers['host'] = $resourceOptions['defaultHost'];
-                    }
-                    if (! empty($resourceOptions['schemes'])) {
-                        $analysis->openapi->servers['schemes'] = $resourceOptions['schemes'];
-                    }
+                    $analysis->openapi->servers = $options->getServers($resourceOptions);
 
                     return $analysis->openapi;
                 },

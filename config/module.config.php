@@ -16,17 +16,6 @@ return [
                     ],
                 ],
             ],
-
-            'swagger-resource-detail' => [
-                'type'    => 'Segment',
-                'options' => [
-                    'route'    => '/api/docs/:resource',
-                    'defaults' => [
-                        'controller' => DocumentationController::class,
-                        'action'     => 'details',
-                    ],
-                ],
-            ],
         ],
     ],
 

@@ -94,7 +94,6 @@ class ModuleOptions extends AbstractOptions
         foreach ($this->paths as $path) {
             $directoryIterator = new DirectoryIterator($path);
 
-            /** @var $file DirectoryIterator */
             foreach ($directoryIterator as $file) {
                 if (! $file->isDir()) {
                     $fileList[] = $file->getPathname();
@@ -109,7 +108,7 @@ class ModuleOptions extends AbstractOptions
      *
      * @return array
      */
-    public function getResourceOptions()
+    public function getResourceOptions(): array
     {
         return $this->resourceOptions;
     }
@@ -118,8 +117,34 @@ class ModuleOptions extends AbstractOptions
      *
      * @param array $resourceOptions
      */
-    public function setResourceOptions($resourceOptions)
+    public function setResourceOptions(array $resourceOptions)
     {
         $this->resourceOptions = $resourceOptions;
+    }
+
+    /**
+     * Generates servers list from Resources Options config
+     *
+     * @param array $resourceOptions
+     * @return array[] Servers list
+     */
+    public function getServers(array $resourceOptions): array
+    {
+        if (! empty($resourceOptions['servers'])) {
+            return $resourceOptions['servers'];
+        }
+
+        if (empty($resourceOptions['schemes'])) {
+            return [];
+        }
+        $servers = [];
+        foreach ($resourceOptions['schemes'] as $scheme) {
+            $servers[] = [
+                'url' => $scheme . '://' . ($resourceOptions['defaultHost'] ?? '') .
+                         ($resourceOptions['defaultBasePath'] ?? ''),
+            ];
+        }
+
+        return $servers;
     }
 }

@@ -56,7 +56,6 @@ class DocumentationController extends AbstractActionController
      */
     public function displayAction()
     {
-        $jsonModel = new JsonModel((array)$this->openApi->jsonSerialize());
-        return $jsonModel;
+        return new JsonModel((array) $this->openApi->jsonSerialize());
     }
 }
